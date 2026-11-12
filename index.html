@@ -124,29 +124,33 @@
 let paso = 1, totalPasos = 6;
 let visita="", gustos=[], estilo="", puntos=5;
 
-// Solo por correo - ya no se guarda en el celu ni hay panel
+const URL_PLANILLA = "https://script.google.com/macros/s/AKfycbzAWhvhOFtAgr25M_reyKANL64-DJEEdvUPE5pyBhwLhvMlFACg43QLBfwo8adJamm1/execs";
+
 async function enviarAlMail(datos) {
-  try {
+  // 1. Sigue llegando por mail como ahora
+  try{
     await fetch('https://formsubmit.co/ajax/luminaofe@gmail.com', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        nombre: datos.nombre,
-        edad: datos.edad,
-        visita: datos.visita,
-        gustos: datos.gustos,
-        estilo: datos.estilo,
-        puntos: datos.puntuacion,
-        gusto: datos.gusto,
-        mejora: datos.mejora,
-        recomienda: datos.recomienda,
-        fecha: datos.fecha,
-        _subject: 'Nueva encuesta LUMINA!',
-        _captcha: 'false',
-        _template: 'table'
+        nombre: datos.nombre, edad: datos.edad, visita: datos.visita,
+        gustos: datos.gustos, estilo: datos.estilo, puntos: datos.puntuacion,
+        gusto: datos.gusto, mejora: datos.mejora, recomienda: datos.recomienda,
+        fecha: datos.fecha, _subject: 'Nueva encuesta LUMINA!',
+        _captcha: 'false', _template: 'table'
       })
     });
-  } catch(e) { console.log('No se pudo enviar por mail'); }
+  }catch(e){}
+
+  // 2. Además se guarda en la planilla para los porcentajes
+  try{
+    await fetch(URL_PLANILLA, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos)
+    });
+  }catch(e){}
 }
 
 function actualizar(){

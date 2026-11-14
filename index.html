@@ -27,6 +27,9 @@
   button{flex:1; padding:14px; border:none; border-radius:14px; font-size:16px; font-weight:bold; cursor:pointer;}
   .btn-sig{background:#d4af37; color:#000;}
   .btn-ant{background:#333; color:#fff; border:1px solid #d4af37;}
+  table{width:100%; border-collapse:collapse; font-size:12px; margin-top:10px;}
+  th,td{border:1px solid #ddd; padding:8px; text-align:left;}
+  th{background:#d4af37; color:#000;}
 </style>
 </head>
 <body>
@@ -40,10 +43,24 @@
     <button class="btn-ant" id="btnAnt" onclick="anterior()" style="display:none">⬅ Anterior</button>
     <button class="btn-sig" id="btnSig" onclick="siguiente()">Siguiente ➡</button>
   </div>
+  <div style="text-align:center; margin-top:25px;">
+    <button onclick="verResultados()" style="background:transparent; border:none; color:#444; font-size:14px; cursor:pointer; flex:none;">• • •</button>
+  </div>
+  <div id="admin" style="display:none; background:#fff; color:#000; border-radius:18px; padding:18px; margin-top:10px;">
+    <h3 style="text-align:center; margin:0;">🔒 Solo Dueña - LUMINA</h3>
+    <p style="text-align:center; font-size:12px; color:#666;">Tabla ordenada + Gráfico de porcentajes</p>
+    <div id="tablaAdmin"><p style="text-align:center;">Cargando...</p></div>
+    <canvas id="grafico" style="margin-top:15px;"></canvas>
+    <button onclick="descargarExcel()" style="width:100%; margin-top:15px; background:#d4af37; padding:14px; border:none; border-radius:12px; font-weight:bold;">📥 DESCARGAR EXCEL</button>
+    <button onclick="document.getElementById('admin').style.display='none'" style="width:100%; margin-top:8px; background:#eee; padding:10px; border:none; border-radius:12px;">Cerrar</button>
+  </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 <script>
-let paso=0, datos={};
-let estrellasSel=0;
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyBkn-IKvnKZ8gGLwAW9s4rkAD08Xthr7ElWkvXFeu-gsfN8jjqlVKE9SQx3e_4ne6l/exec";
+let paso=0, datosEncuesta=[], nombre="", favorito="", estilo="", estrellasSel=0, volveria="", mejorar="";
+let miChart=null;
 const pasos=[
   {t:"¿Cómo te llamás?", d:"Queremos conocerte", html:`<input id="v" placeholder="Tu nombre">`},
   {t:"¿Qué accesorio te gusta más?", d:"Elegí uno", html:`<div class="chips" id="chips"></div>`},
@@ -61,16 +78,55 @@ function mostrar(){
   document.getElementById('btnSig').innerText=paso==6?'Terminar ✨':'Siguiente ➡';
   if(paso==1||paso==2){
     let ops=paso==1?['Anillos','Collares','Aros','Pulseras']:['Elegante','Casual','Brillante','Minimalista'];
-    document.getElementById('chips').innerHTML=ops.map(o=>`<div class="chip" onclick="this.classList.toggle('sel')">${o}</div>`).join('');
+    document.getElementById('chips').innerHTML=ops.map(o=>`<div class="chip" onclick="seleccionarChip(this,'${paso==1?'fav':'est'}')">${o}</div>`).join('');
   }
-  if(paso==3){
-    document.getElementById('est').innerHTML=[1,2,3,4,5].map(n=>`<span onclick="setEst(${n})">★</span>`).join('');
+  if(paso==3){ document.getElementById('est').innerHTML=[1,2,3,4,5].map(n=>`<span onclick="setEst(${n})">★</span>`).join(''); }
+}
+function seleccionarChip(el,tipo){ el.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel')); el.classList.add('sel'); if(tipo=='fav') favorito=el.innerText; else estilo=el.innerText; }
+function setEst(n){ estrellasSel=n; document.querySelectorAll('#est span').forEach((s,i)=>s.classList.toggle('sel', i<n)); }
+function guardarPaso(){ let v=document.getElementById('v'); if(paso==0) nombre=v?v.value:""; if(paso==4) volveria=v?v.value:""; if(paso==5) mejorar=v?v.value:""; }
+async function siguiente(){
+  guardarPaso();
+  if(paso<6){ paso++; mostrar(); }
+  else{
+    let nuevo={Nombre:nombre, Favorito:favorito, Estilo:estilo, Estrellas:estrellasSel, Volveria:volveria, Mejora:mejorar};
+    try{
+      await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify(nuevo)});
+    }catch(e){}
+    alert("¡Gracias! Tu respuesta se guardó en LUMINA 💛");
+    paso=0; mostrar();
   }
 }
-function setEst(n){ estrellasSel=n; document.querySelectorAll('#est span').forEach((s,i)=>s.classList.toggle('sel', i<n)); }
-function siguiente(){ if(paso<6){paso++; mostrar();} }
-function anterior(){ if(paso>0){paso--; mostrar();} }
+function anterior(){ if(paso>0){ paso--; mostrar(); } }
 mostrar();
+async function verResultados(){
+  let clave=prompt("Contraseña de la dueña:");
+  if(clave!=="jaredabril"){ alert("No tenés permiso"); return; }
+  document.getElementById('admin').style.display='block';
+  document.getElementById('tablaAdmin').innerHTML="<p style='text-align:center;'>Cargando datos de Sheets...</p>";
+  try{
+    let r=await fetch(SCRIPT_URL);
+    datosEncuesta=await r.json();
+  }catch(e){ alert("No se pudo cargar, abrí la planilla en Sheets"); return; }
+  mostrarTablaYGrafico();
+}
+function mostrarTablaYGrafico(){
+  if(datosEncuesta.length==0){ document.getElementById('tablaAdmin').innerHTML="<p>No hay respuestas todavía</p>"; return; }
+  let ordenadas=[...datosEncuesta].reverse();
+  let html=`<table><tr><th>Nombre</th><th>Favorito</th><th>Estilo</th><th>★</th></tr>`;
+  ordenadas.forEach(d=>{ html+=`<tr><td>${d.Nombre||''}</td><td>${d.Favorito||''}</td><td>${d.Estilo||''}</td><td>${d.Estrellas||''} ★</td></tr>`; });
+  html+=`</table><p style="font-size:12px;">Total: ${datosEncuesta.length} respuestas</p>`;
+  document.getElementById('tablaAdmin').innerHTML=html;
+  let conteo={}; datosEncuesta.forEach(d=>{ let k=d.Favorito||'Sin elegir'; conteo[k]=(conteo[k]||0)+1; });
+  if(miChart) miChart.destroy();
+  miChart=new Chart(document.getElementById('grafico'),{type:'pie', data:{labels:Object.keys(conteo), datasets:[{data:Object.values(conteo), backgroundColor:['#d4af37','#000','#ffdf7e','#a67c00','#cbb87a']}]}, options:{plugins:{legend:{position:'bottom'}, tooltip:{callbacks:{label:function(c){ let total=c.dataset.data.reduce((a,b)=>a+b,0); let pct=Math.round(c.raw/total*100); return c.label+': '+pct+'% ('+c.raw+')'; }}}}}});
+}
+function descargarExcel(){
+  if(datosEncuesta.length==0){ alert("No hay datos todavía"); return; }
+  let ws=XLSX.utils.json_to_sheet(datosEncuesta);
+  let wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Respuestas LUMINA");
+  XLSX.writeFile(wb, "LUMINA_Respuestas.xlsx");
+}
 </script>
 </body>
 </html>

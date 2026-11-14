@@ -6,29 +6,71 @@
 <title>Lumina | Tu opinión brilla</title>
 <style>
   *{box-sizing:border-box; font-family:'Segoe UI', Arial, sans-serif;}
-  body{margin:0; background:#000000; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:16px; color:#fff;}
-  .card{width:100%; max-width:560px; background:#111111; border:2px solid #d4af37; border-radius:28px; padding:28px; box-shadow:0 0 35px rgba(212,175,55,.30); overflow:hidden; position:relative; text-align:center;}
+  body{margin:0; background:#000; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:16px; color:#fff;}
+  .card{width:100%; max-width:560px; background:#111; border:2px solid #d4af37; border-radius:28px; padding:28px; box-shadow:0 0 35px rgba(212,175,55,.30); position:relative; overflow:hidden;}
   .card:before{content:""; position:absolute; top:0; left:0; right:0; height:6px; background:linear-gradient(90deg,#a67c00,#ffe89a,#a67c00);}
   .logo{width:100%; max-width:380px; display:block; margin:5px auto 0; border-radius:14px;}
-  .sub{text-align:center; color:#e8c873; font-size:15px; margin:12px 0 18px; line-height:1.5;}
-  .pregunta{font-size:24px; font-weight:800; color:#ffffff; line-height:1.2;}
-  .desc{color:#cbb87a; font-size:14px; margin-top:8px; line-height:1.5;}
-  .boton{display:inline-block; margin-top:22px; background:linear-gradient(90deg,#a67c00,#ffe89a); color:#000; padding:18px 32px; font-size:20px; font-weight:800; border-radius:16px; text-decoration:none; box-shadow:0 0 20px rgba(212,175,55,.4);}
-  .boton:active{transform:scale(0.97);}
-  .mini{margin-top:16px; font-size:12px; color:#9a8f6a;}
+  .sub{text-align:center; color:#e8c873; font-size:14px; margin:12px 0 18px;}
+  .progreso{background:#2a2a2a; height:12px; border-radius:20px; overflow:hidden; border:1px solid #d4af37;}
+  .barra{height:100%; width:14%; background:linear-gradient(90deg,#a67c00,#ffe89a); transition:0.4s;}
+  .paso-texto{text-align:center; font-size:12px; color:#ffd977; font-weight:bold; margin:8px 0 20px;}
+  .pregunta{font-size:22px; font-weight:800;}
+  .desc{color:#cbb87a; font-size:14px; margin-top:6px;}
+  input, select, textarea{width:100%; padding:14px; margin-top:14px; border:2px solid #d4af37; border-radius:14px; font-size:16px; background:#000; color:#fff; outline:none;}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;}
+  .chip{padding:10px 14px; border:2px solid #d4af37; border-radius:20px; cursor:pointer; font-size:14px; background:#000; color:#fff;}
+  .chip.sel{background:#d4af37; color:#000; font-weight:bold;}
+  .estrellas{display:flex; gap:6px; font-size:38px; margin-top:14px; justify-content:center;}
+  .estrellas span{cursor:pointer; color:#555;}
+  .estrellas span.sel{color:#ffd700;}
+  .btns{display:flex; gap:10px; margin-top:20px;}
+  button{flex:1; padding:14px; border:none; border-radius:14px; font-size:16px; font-weight:bold; cursor:pointer;}
+  .btn-sig{background:#d4af37; color:#000;}
+  .btn-ant{background:#333; color:#fff; border:1px solid #d4af37;}
 </style>
 </head>
 <body>
-  <div class="card">
-    <img class="logo" src="https://i.imgur.com/8QwKzXv.png" alt="LUMINA">
-    <p class="sub">Tu opinión hace que LUMINA brille más ✨</p>
-
-    <div class="pregunta">¿Nos ayudás con tu opinión?</div>
-    <p class="desc">Te lleva 1 minuto.<br>Contanos qué te gustó, qué estilo te gusta más y qué mejorarías.</p>
-
-    <a class="boton" href="https://forms.gle/8PMgDShsqmGeceWM7" target="_blank">✨ ¡HACER MI ENCUESTA! ✨</a>
-
-    <p class="mini">Al tocar el botón se abre la encuesta oficial de LUMINA.<br>Tus respuestas se guardan automáticamente.</p>
+<div class="card">
+  <img class="logo" src="https://i.imgur.com/8QwKzXv.png" alt="LUMINA">
+  <p class="sub">Tu opinión hace que LUMINA brille más ✨</p>
+  <div class="progreso"><div class="barra" id="barra"></div></div>
+  <div class="paso-texto" id="pasoTexto">PASO 1 DE 7</div>
+  <div id="contenido"></div>
+  <div class="btns">
+    <button class="btn-ant" id="btnAnt" onclick="anterior()" style="display:none">⬅ Anterior</button>
+    <button class="btn-sig" id="btnSig" onclick="siguiente()">Siguiente ➡</button>
   </div>
+</div>
+<script>
+let paso=0, datos={};
+let estrellasSel=0;
+const pasos=[
+  {t:"¿Cómo te llamás?", d:"Queremos conocerte", html:`<input id="v" placeholder="Tu nombre">`},
+  {t:"¿Qué accesorio te gusta más?", d:"Elegí uno", html:`<div class="chips" id="chips"></div>`},
+  {t:"¿Qué estilo te gusta?", d:"Elegí tu estilo", html:`<div class="chips" id="chips"></div>`},
+  {t:"¿Cuánto te gustó LUMINA?", d:"Tocá las estrellas", html:`<div class="estrellas" id="est"></div>`},
+  {t:"¿Volverías a comprar?", d:"", html:`<select id="v"><option>Sí, seguro</option><option>Tal vez</option><option>No</option></select>`},
+  {t:"¿Qué mejorarías?", d:"Contanos", html:`<textarea id="v" placeholder="Escribí acá..."></textarea>`},
+  {t:"¡Gracias por brillar con nosotros! ✨", d:"Ya terminaste", html:`<p style="text-align:center; margin-top:14px;">Tus respuestas quedaron guardadas. ¡Gracias! 💛</p>`}
+];
+function mostrar(){
+  document.getElementById('barra').style.width=((paso+1)/7*100)+'%';
+  document.getElementById('pasoTexto').innerText=`PASO ${paso+1} DE 7`;
+  document.getElementById('contenido').innerHTML=`<div class="pregunta">${pasos[paso].t}</div><div class="desc">${pasos[paso].d}</div>${pasos[paso].html}`;
+  document.getElementById('btnAnt').style.display=paso==0?'none':'block';
+  document.getElementById('btnSig').innerText=paso==6?'Terminar ✨':'Siguiente ➡';
+  if(paso==1||paso==2){
+    let ops=paso==1?['Anillos','Collares','Aros','Pulseras']:['Elegante','Casual','Brillante','Minimalista'];
+    document.getElementById('chips').innerHTML=ops.map(o=>`<div class="chip" onclick="this.classList.toggle('sel')">${o}</div>`).join('');
+  }
+  if(paso==3){
+    document.getElementById('est').innerHTML=[1,2,3,4,5].map(n=>`<span onclick="setEst(${n})">★</span>`).join('');
+  }
+}
+function setEst(n){ estrellasSel=n; document.querySelectorAll('#est span').forEach((s,i)=>s.classList.toggle('sel', i<n)); }
+function siguiente(){ if(paso<6){paso++; mostrar();} }
+function anterior(){ if(paso>0){paso--; mostrar();} }
+mostrar();
+</script>
 </body>
 </html>

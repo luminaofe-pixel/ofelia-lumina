@@ -6,123 +6,280 @@
 <title>Lumina | Tu opinión brilla</title>
 <style>
   *{box-sizing:border-box; font-family:'Segoe UI', Arial, sans-serif;}
-  body{margin:0; background:#000; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:16px; color:#fff;}
-  .card{width:100%; max-width:560px; background:#111; border:2px solid #d4af37; border-radius:28px; padding:28px; box-shadow:0 0 35px rgba(212,175,55,.30); position:relative; overflow:hidden;}
+  body{margin:0; background:#000000; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:16px; color:#fff;}
+  .card{width:100%; max-width:560px; background:#111111; border:2px solid #d4af37; border-radius:28px; padding:28px; box-shadow:0 0 35px rgba(212,175,55,.30); overflow:hidden; position:relative;}
   .card:before{content:""; position:absolute; top:0; left:0; right:0; height:6px; background:linear-gradient(90deg,#a67c00,#ffe89a,#a67c00);}
   .logo{width:100%; max-width:380px; display:block; margin:5px auto 0; border-radius:14px;}
   .sub{text-align:center; color:#e8c873; font-size:14px; margin:12px 0 18px;}
   .progreso{background:#2a2a2a; height:12px; border-radius:20px; overflow:hidden; border:1px solid #d4af37;}
-  .barra{height:100%; width:14%; background:linear-gradient(90deg,#a67c00,#ffe89a); transition:0.4s;}
-  .paso-texto{text-align:center; font-size:12px; color:#ffd977; font-weight:bold; margin:8px 0 20px;}
-  .pregunta{font-size:22px; font-weight:800;}
+  .barra{height:100%; width:14%; background:linear-gradient(90deg,#a67c00,#ffe89a); transition:0.4s; border-radius:20px;}
+  .paso-texto{text-align:center; font-size:12px; color:#ffd977; font-weight:bold; margin:8px 0 20px; letter-spacing:1px;}
+  .pregunta{font-size:22px; font-weight:800; color:#ffffff; line-height:1.2; animation:entrar .4s ease;}
   .desc{color:#cbb87a; font-size:14px; margin-top:6px;}
-  input, select, textarea{width:100%; padding:14px; margin-top:14px; border:2px solid #d4af37; border-radius:14px; font-size:16px; background:#000; color:#fff; outline:none;}
+  @keyframes entrar{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)}}
+  input, select, textarea{width:100%; padding:14px; margin-top:14px; border:2px solid #d4af37; border-radius:14px; font-size:16px; outline:none; background:#000; color:#fff;}
+  input::placeholder, textarea::placeholder{color:#9a8f6a}
+  input:focus, select:focus, textarea:focus{border-color:#ffe89a; box-shadow:0 0 0 2px rgba(255,215,0,.25);}
+  select option{background:#000; color:#fff}
+  textarea{height:90px; resize:none;}
   .chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;}
-  .chip{padding:10px 14px; border:2px solid #d4af37; border-radius:20px; cursor:pointer; font-size:14px; background:#000; color:#fff;}
-  .chip.sel{background:#d4af37; color:#000; font-weight:bold;}
+  .chip{padding:10px 14px; border:2px solid #d4af37; border-radius:20px; cursor:pointer; font-size:14px; background:#000; color:#fff; transition:.2s;}
+  .chip.sel{background:#d4af37; color:#000; border-color:#ffe89a; font-weight:bold;}
   .estrellas{display:flex; gap:6px; font-size:38px; margin-top:14px; justify-content:center;}
-  .estrellas span{cursor:pointer; color:#555;}
-  .estrellas span.sel{color:#ffd700;}
-  .btns{display:flex; gap:10px; margin-top:20px;}
+  .estrellas span{cursor:pointer; filter:grayscale(1); transition:.2s;}
+  .estrellas span.sel{filter:grayscale(0); transform:scale(1.15);}
+  .botones{display:flex; gap:10px; margin-top:22px;}
   button{flex:1; padding:14px; border:none; border-radius:14px; font-size:16px; font-weight:bold; cursor:pointer;}
-  .btn-sig{background:#d4af37; color:#000;}
-  .btn-ant{background:#333; color:#fff; border:1px solid #d4af37;}
-  table{width:100%; border-collapse:collapse; font-size:12px; margin-top:10px;}
-  th,td{border:1px solid #ddd; padding:8px; text-align:left;}
+  .btn-sig{background:linear-gradient(180deg,#ffe89a,#d4af37,#a67c00); color:#000;}
+  .btn-atras{background:#2a2a2a; color:#fff; border:1px solid #d4af37;}
+  .oculto{display:none !important;}
+  .final{text-align:center; animation:entrar .5s ease;}
+  .final h2{font-size:28px; color:#ffd977; margin:10px 0;}
+  .final p{color:#e8e8e8; line-height:1.5;}
+  label{color:#ffd977 !important;}
+  table{width:100%; border-collapse:collapse; font-size:11px; margin-top:10px; background:#fff;}
+  th,td{border:1px solid #ddd; padding:6px; text-align:left;}
   th{background:#d4af37; color:#000;}
 </style>
 </head>
 <body>
-<div class="card">
-  <img class="logo" src="https://i.imgur.com/8QwKzXv.png" alt="LUMINA">
-  <p class="sub">Tu opinión hace que LUMINA brille más ✨</p>
+
+<div class="card" id="vistaEncuesta">
+  <img src="logo.png" class="logo" alt="Lumina">
+  <p class="sub">Joyería & Accesorios ✨ Tu opinión hace brillar a Lumina<br>San Roque - Corrientes</p>
+
   <div class="progreso"><div class="barra" id="barra"></div></div>
-  <div class="paso-texto" id="pasoTexto">PASO 1 DE 7</div>
-  <div id="contenido"></div>
-  <div class="btns">
-    <button class="btn-ant" id="btnAnt" onclick="anterior()" style="display:none">⬅ Anterior</button>
-    <button class="btn-sig" id="btnSig" onclick="siguiente()">Siguiente ➡</button>
+  <div class="paso-texto" id="pasoTexto">PASO 1 DE 6 • ¡EMPECEMOS!</div>
+
+  <div class="paso" id="paso1">
+    <div class="pregunta">¡Hola! ¿Cómo te llamás? 💛</div>
+    <div class="desc">Queremos conocerte para atenderte mejor.</div>
+    <input type="text" id="nombre" placeholder="Escribí tu nombre...">
+    <label style="font-size:13px; display:block; margin-top:14px;">¿Cuántos años tenés?</label>
+    <select id="edad"><option>Menor de 18</option><option>18 a 25</option><option selected>26 a 35</option><option>36 a 50</option><option>Más de 50</option></select>
   </div>
-  <div style="text-align:center; margin-top:25px;">
+
+  <div class="paso oculto" id="paso2">
+    <div class="pregunta" id="titulo2">¿Visitaste nuestro local?</div>
+    <div class="desc">Tocá la opción que más te represente.</div>
+    <div class="chips" id="chipsVisita">
+      <div class="chip">Entré y compré 🛍️</div>
+      <div class="chip">Entré y solo miré 👀</div>
+      <div class="chip">Solo lo vi de afuera</div>
+      <div class="chip">Solo lo vi por Instagram / WhatsApp 📱</div>
+    </div>
+  </div>
+
+  <div class="paso oculto" id="paso3">
+    <div class="pregunta">¿Qué te enamora más de Lumina?</div>
+    <div class="desc">Podés elegir varios, ¡no te limites!</div>
+    <div class="chips" id="chipsGustos">
+      <div class="chip">💍 Anillos</div><div class="chip">✨ Collares</div><div class="chip">💎 Aros</div><div class="chip">📿 Pulseras</div><div class="chip">⌚ Relojes</div><div class="chip">🎀 Accesorios pelo</div><div class="chip">👜 Carteras / Lentes</div>
+    </div>
+  </div>
+
+  <div class="paso oculto" id="paso4">
+    <div class="pregunta">¿Qué estilo es más vos?</div>
+    <div class="chips" id="chipsEstilo">
+      <div class="chip">Delicado / Minimalista 🤍</div><div class="chip">Elegante / Dorado 👑</div><div class="chip">Moderno / Juvenil 🔥</div><div class="chip">Artesanal / Rústico 🌿</div><div class="chip">Colorido / Llamativo 🌈</div>
+    </div>
+  </div>
+
+  <div class="paso oculto" id="paso5">
+    <div class="pregunta">Del 1 al 5, ¿cómo fue tu experiencia?</div>
+    <div class="desc">Tocá las estrellitas, ¡queremos saber la verdad!</div>
+    <div class="estrellas" id="estrellas"><span data-v="1">⭐</span><span data-v="2">⭐</span><span data-v="3">⭐</span><span data-v="4">⭐</span><span data-v="5">⭐</span></div>
+    <textarea id="gusto" placeholder="¿Qué fue lo que más te gustó? Ej: la atención, los precios, la variedad..."></textarea>
+  </div>
+
+  <div class="paso oculto" id="paso6">
+    <div class="pregunta">Si Lumina fuera tu negocio, ¿qué le agregarías?</div>
+    <div class="desc">¡Tu idea puede hacerse realidad!</div>
+    <textarea id="mejora" placeholder="Ej: Más variedad para hombres, ofertas, espejo grande, música, sillitas para esperar, sorteos..."></textarea>
+    <label style="font-size:13px; display:block; margin-top:14px;">¿Nos recomendarías?</label>
+    <select id="recomienda"><option>Sí, seguro 💛</option><option>Probablemente sí</option><option>No estoy seguro/a</option><option>No</option></select>
+  </div>
+
+  <div class="paso oculto final" id="pasoFinal">
+    <div style="font-size:60px;">🎉✨</div>
+    <h2 id="graciasNombre">¡Gracias!</h2>
+    <p>Tu respuesta ya quedó enviada a Lumina.<br>Gracias por ayudarnos a hacer un lugar más lindo para todos.</p>
+    <p style="font-size:13px; color:#aaa;" id="fechaGuardada"></p>
+    <button class="btn-sig" onclick="location.reload()">Hacer otra encuesta</button>
+  </div>
+
+  <div class="botones" id="botonesNav">
+    <button class="btn-atras" id="btnAtras" onclick="cambiarPaso(-1)">← Atrás</button>
+    <button class="btn-sig" id="btnSig" onclick="cambiarPaso(1)">Siguiente →</button>
+  </div>
+
+  <!-- BOTON SECRETO SOLO DUEÑA -->
+  <div style="text-align:center; margin-top:18px;">
     <button onclick="verResultados()" style="background:transparent; border:none; color:#444; font-size:14px; cursor:pointer; flex:none;">• • •</button>
   </div>
+
   <div id="admin" style="display:none; background:#fff; color:#000; border-radius:18px; padding:18px; margin-top:10px;">
     <h3 style="text-align:center; margin:0;">🔒 Solo Dueña - LUMINA</h3>
     <p style="text-align:center; font-size:12px; color:#666;">Tabla ordenada + Gráfico de porcentajes</p>
     <div id="tablaAdmin"><p style="text-align:center;">Cargando...</p></div>
     <canvas id="grafico" style="margin-top:15px;"></canvas>
+    <canvas id="graficoEstilo" style="margin-top:15px;"></canvas>
     <button onclick="descargarExcel()" style="width:100%; margin-top:15px; background:#d4af37; padding:14px; border:none; border-radius:12px; font-weight:bold;">📥 DESCARGAR EXCEL</button>
     <button onclick="document.getElementById('admin').style.display='none'" style="width:100%; margin-top:8px; background:#eee; padding:10px; border:none; border-radius:12px;">Cerrar</button>
   </div>
+
+  <p style="text-align:center; font-size:12px; color:#8a7d55; margin-top:16px;">Lumina • luminaofe@gmail.com • San Roque</p>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyBkn-IKvnKZ8gGLwAW9s4rkAD08Xthr7ElWkvXFeu-gsfN8jjqlVKE9SQx3e_4ne6l/exec";
-let paso=0, datosEncuesta=[], nombre="", favorito="", estilo="", estrellasSel=0, volveria="", mejorar="";
-let miChart=null;
-const pasos=[
-  {t:"¿Cómo te llamás?", d:"Queremos conocerte", html:`<input id="v" placeholder="Tu nombre">`},
-  {t:"¿Qué accesorio te gusta más?", d:"Elegí uno", html:`<div class="chips" id="chips"></div>`},
-  {t:"¿Qué estilo te gusta?", d:"Elegí tu estilo", html:`<div class="chips" id="chips"></div>`},
-  {t:"¿Cuánto te gustó LUMINA?", d:"Tocá las estrellas", html:`<div class="estrellas" id="est"></div>`},
-  {t:"¿Volverías a comprar?", d:"", html:`<select id="v"><option>Sí, seguro</option><option>Tal vez</option><option>No</option></select>`},
-  {t:"¿Qué mejorarías?", d:"Contanos", html:`<textarea id="v" placeholder="Escribí acá..."></textarea>`},
-  {t:"¡Gracias por brillar con nosotros! ✨", d:"Ya terminaste", html:`<p style="text-align:center; margin-top:14px;">Tus respuestas quedaron guardadas. ¡Gracias! 💛</p>`}
-];
-function mostrar(){
-  document.getElementById('barra').style.width=((paso+1)/7*100)+'%';
-  document.getElementById('pasoTexto').innerText=`PASO ${paso+1} DE 7`;
-  document.getElementById('contenido').innerHTML=`<div class="pregunta">${pasos[paso].t}</div><div class="desc">${pasos[paso].d}</div>${pasos[paso].html}`;
-  document.getElementById('btnAnt').style.display=paso==0?'none':'block';
-  document.getElementById('btnSig').innerText=paso==6?'Terminar ✨':'Siguiente ➡';
-  if(paso==1||paso==2){
-    let ops=paso==1?['Anillos','Collares','Aros','Pulseras']:['Elegante','Casual','Brillante','Minimalista'];
-    document.getElementById('chips').innerHTML=ops.map(o=>`<div class="chip" onclick="seleccionarChip(this,'${paso==1?'fav':'est'}')">${o}</div>`).join('');
-  }
-  if(paso==3){ document.getElementById('est').innerHTML=[1,2,3,4,5].map(n=>`<span onclick="setEst(${n})">★</span>`).join(''); }
+let paso = 1, totalPasos = 6;
+let visita="", gustos=[], estilo="", puntos=5;
+let datosEncuesta=[], miChart=null, miChart2=null;
+
+// TU LINK NUEVO - el que me pasaste
+const URL_PLANILLA = "https://script.google.com/macros/s/AKfycbyBkn-IKvnKZ8gGLwAW9s4rkAD08Xthr7ElWkvXFeu-gsfN8jjqlVKE9SQx3e_4ne6l/exec";
+
+async function enviarAlMail(datos) {
+  try{
+    await fetch('https://formsubmit.co/ajax/luminaofe@gmail.com', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nombre: datos.nombre, edad: datos.edad, visita: datos.visita,
+        gustos: datos.gustos, estilo: datos.estilo, puntos: datos.puntos,
+        gusto: datos.gusto, mejora: datos.mejora, recomienda: datos.recomienda,
+        fecha: datos.fecha, _subject: 'Nueva encuesta LUMINA!',
+        _captcha: 'false', _template: 'table'
+      })
+    });
+  }catch(e){}
+  try{
+    await fetch(URL_PLANILLA, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos)
+    });
+  }catch(e){}
 }
-function seleccionarChip(el,tipo){ el.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel')); el.classList.add('sel'); if(tipo=='fav') favorito=el.innerText; else estilo=el.innerText; }
-function setEst(n){ estrellasSel=n; document.querySelectorAll('#est span').forEach((s,i)=>s.classList.toggle('sel', i<n)); }
-function guardarPaso(){ let v=document.getElementById('v'); if(paso==0) nombre=v?v.value:""; if(paso==4) volveria=v?v.value:""; if(paso==5) mejorar=v?v.value:""; }
-async function siguiente(){
-  guardarPaso();
-  if(paso<6){ paso++; mostrar(); }
-  else{
-    let nuevo={Nombre:nombre, Favorito:favorito, Estilo:estilo, Estrellas:estrellasSel, Volveria:volveria, Mejora:mejorar};
-    try{
-      await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify(nuevo)});
-    }catch(e){}
-    alert("¡Gracias! Tu respuesta se guardó en LUMINA 💛");
-    paso=0; mostrar();
+
+function actualizar(){
+  document.querySelectorAll('.paso').forEach(p=>p.classList.add('oculto'));
+  document.getElementById('paso'+paso)?.classList.remove('oculto');
+  document.getElementById('barra').style.width = (paso/totalPasos*100)+'%';
+  document.getElementById('pasoTexto').innerText = `PASO ${paso} DE ${totalPasos} • ${paso===totalPasos?'¡YA CASI TERMINÁS!':'SEGUÍ ASÍ'}`;
+  document.getElementById('btnAtras').style.visibility = paso===1?'hidden':'visible';
+  document.getElementById('btnSig').innerText = paso===totalPasos?'¡Enviar mi encuesta 💛':'Siguiente →';
+  if(paso===2){
+    let n=document.getElementById('nombre').value || '¡Qué lindo conocerte!';
+    document.getElementById('titulo2').innerText = `¡Gracias, ${n}! ¿Visitaste nuestro local?`;
   }
 }
-function anterior(){ if(paso>0){ paso--; mostrar(); } }
-mostrar();
+actualizar();
+
+function cambiarPaso(dir){
+  if(dir===1){
+    if(paso===1 && !document.getElementById('nombre').value.trim()){ alert('¡Contanos tu nombre para seguir! 💛'); return; }
+    if(paso===2 && !visita){ alert('Elegí una opción para seguir'); return; }
+    if(paso===6){ guardar(); return; }
+  }
+  paso += dir;
+  if(paso<1) paso=1;
+  actualizar();
+}
+
+function setupChips(id, single, callback){
+  document.querySelectorAll('#'+id+' .chip').forEach(c=>{
+    c.onclick=()=>{
+      if(single){ document.querySelectorAll('#'+id+' .chip').forEach(x=>x.classList.remove('sel')); c.classList.add('sel'); callback(c.innerText); }
+      else{ c.classList.toggle('sel'); callback(); }
+    }
+  });
+}
+setupChips('chipsVisita', true, t=>visita=t);
+setupChips('chipsEstilo', true, t=>estilo=t);
+setupChips('chipsGustos', false, ()=>{
+  gustos=[...document.querySelectorAll('#chipsGustos .chip.sel')].map(c=>c.innerText);
+});
+
+document.querySelectorAll('#estrellas span').forEach(s=>{
+  s.onclick=()=>{
+    puntos=parseInt(s.dataset.v);
+    document.querySelectorAll('#estrellas span').forEach((x,i)=>x.classList.toggle('sel', i<puntos));
+  }
+});
+document.querySelectorAll('#estrellas span').forEach(s=>s.classList.add('sel'));
+
+function guardar(){
+  const nueva={
+    fecha:new Date().toLocaleString('es-AR'),
+    nombre:document.getElementById('nombre').value,
+    edad:document.getElementById('edad').value,
+    visita, gustos:gustos.join(', '), estilo:estilo||'No eligió',
+    puntos:puntos+' estrellas',
+    gusto:document.getElementById('gusto').value,
+    mejora:document.getElementById('mejora').value,
+    recomienda:document.getElementById('recomienda').value
+  };
+  enviarAlMail(nueva);
+  document.querySelectorAll('.paso').forEach(p=>p.classList.add('oculto'));
+  document.getElementById('pasoFinal').classList.remove('oculto');
+  document.getElementById('botonesNav').classList.add('oculto');
+  document.getElementById('pasoTexto').innerText='¡LISTO! • GRACIAS POR BRILLAR CON NOSOTROS';
+  document.getElementById('barra').style.width='100%';
+  document.getElementById('graciasNombre').innerText=`¡Gracias, ${nueva.nombre}!`;
+  document.getElementById('fechaGuardada').innerText=`Enviada el ${nueva.fecha}`;
+  for(let i=0;i<40;i++){ let e=document.createElement('div'); e.innerText=['✨','💛','💎','⭐'][i%4]; e.style.position='fixed'; e.style.left=Math.random()*100+'vw'; e.style.top='-20px'; e.style.fontSize='22px'; e.style.zIndex=99; document.body.appendChild(e); let y=-20; let t=setInterval(()=>{ y+=4; e.style.top=y+'px'; if(y>window.innerHeight){ clearInterval(t); e.remove(); } },20); }
+}
+
+// --- SOLO DUEÑA ---
 async function verResultados(){
   let clave=prompt("Contraseña de la dueña:");
   if(clave!=="jaredabril"){ alert("No tenés permiso"); return; }
   document.getElementById('admin').style.display='block';
   document.getElementById('tablaAdmin').innerHTML="<p style='text-align:center;'>Cargando datos de Sheets...</p>";
   try{
-    let r=await fetch(SCRIPT_URL);
+    let r=await fetch(URL_PLANILLA);
     datosEncuesta=await r.json();
-  }catch(e){ alert("No se pudo cargar, abrí la planilla en Sheets"); return; }
+  }catch(e){ alert("No se pudo cargar desde Sheets. Abrí la planilla directamente."); return; }
   mostrarTablaYGrafico();
 }
 function mostrarTablaYGrafico(){
-  if(datosEncuesta.length==0){ document.getElementById('tablaAdmin').innerHTML="<p>No hay respuestas todavía</p>"; return; }
+  if(!datosEncuesta || datosEncuesta.length==0){ document.getElementById('tablaAdmin').innerHTML="<p>No hay respuestas todavía</p>"; return; }
   let ordenadas=[...datosEncuesta].reverse();
-  let html=`<table><tr><th>Nombre</th><th>Favorito</th><th>Estilo</th><th>★</th></tr>`;
-  ordenadas.forEach(d=>{ html+=`<tr><td>${d.Nombre||''}</td><td>${d.Favorito||''}</td><td>${d.Estilo||''}</td><td>${d.Estrellas||''} ★</td></tr>`; });
+  let html=`<table><tr><th>Nombre</th><th>Visita</th><th>Gustos</th><th>Estilo</th><th>★</th></tr>`;
+  ordenadas.forEach(d=>{
+    // La planilla guarda en orden: Fecha, nombre, edad, visita, gustos, estilo, puntos, gusto, mejora, recomienda
+    // doGet devuelve objetos con esos nombres
+    let nom = d.nombre || d.Nombre || d[1] || '';
+    let vis = d.visita || d.Visita || d[3] || '';
+    let gus = d.gustos || d.Gustos || d[4] || '';
+    let est = d.estilo || d.Estilo || d[5] || '';
+    let pts = d.puntos || d.Puntos || d[6] || '';
+    html+=`<tr><td>${nom}</td><td>${vis}</td><td>${gus}</td><td>${est}</td><td>${pts}</td></tr>`;
+  });
   html+=`</table><p style="font-size:12px;">Total: ${datosEncuesta.length} respuestas</p>`;
   document.getElementById('tablaAdmin').innerHTML=html;
-  let conteo={}; datosEncuesta.forEach(d=>{ let k=d.Favorito||'Sin elegir'; conteo[k]=(conteo[k]||0)+1; });
+
+  // Gráfico 1: ¿Qué te enamora más? - porcentajes
+  let conteo={};
+  datosEncuesta.forEach(d=>{
+    let g = d.gustos || d.Gustos || '';
+    g.split(',').forEach(x=>{ x=x.trim(); if(x){ conteo[x]=(conteo[x]||0)+1; } });
+  });
   if(miChart) miChart.destroy();
-  miChart=new Chart(document.getElementById('grafico'),{type:'pie', data:{labels:Object.keys(conteo), datasets:[{data:Object.values(conteo), backgroundColor:['#d4af37','#000','#ffdf7e','#a67c00','#cbb87a']}]}, options:{plugins:{legend:{position:'bottom'}, tooltip:{callbacks:{label:function(c){ let total=c.dataset.data.reduce((a,b)=>a+b,0); let pct=Math.round(c.raw/total*100); return c.label+': '+pct+'% ('+c.raw+')'; }}}}}});
+  miChart=new Chart(document.getElementById('grafico'),{type:'pie', data:{labels:Object.keys(conteo), datasets:[{data:Object.values(conteo), backgroundColor:['#d4af37','#000','#ffdf7e','#a67c00','#cbb87a','#e8c873','#888']}]}, options:{plugins:{title:{display:true, text:'¿Qué te enamora más de Lumina? %'}, legend:{position:'bottom'}, tooltip:{callbacks:{label:function(c){ let total=c.dataset.data.reduce((a,b)=>a+b,0); let pct=Math.round(c.raw/total*100); return c.label+': '+pct+'% ('+c.raw+')'; }}}}}});
+
+  // Gráfico 2: Estilos
+  let conteo2={};
+  datosEncuesta.forEach(d=>{ let k=d.estilo||d.Estilo||'Sin elegir'; conteo2[k]=(conteo2[k]||0)+1; });
+  if(miChart2) miChart2.destroy();
+  miChart2=new Chart(document.getElementById('graficoEstilo'),{type:'pie', data:{labels:Object.keys(conteo2), datasets:[{data:Object.values(conteo2), backgroundColor:['#d4af37','#000','#ffdf7e','#a67c00','#cbb87a']}]}, options:{plugins:{title:{display:true, text:'¿Qué estilo es más vos? %'}, legend:{position:'bottom'}, tooltip:{callbacks:{label:function(c){ let total=c.dataset.data.reduce((a,b)=>a+b,0); let pct=Math.round(c.raw/total*100); return c.label+': '+pct+'% ('+c.raw+')'; }}}}}});
 }
 function descargarExcel(){
-  if(datosEncuesta.length==0){ alert("No hay datos todavía"); return; }
+  if(!datosEncuesta || datosEncuesta.length==0){ alert("Primero abrí los resultados con la contraseña"); return; }
   let ws=XLSX.utils.json_to_sheet(datosEncuesta);
   let wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Respuestas LUMINA");
   XLSX.writeFile(wb, "LUMINA_Respuestas.xlsx");
